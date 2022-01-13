@@ -16,7 +16,7 @@ const Comment = new Schema({
         ref: HOUSE_COLLECTION
     },
     repliedTo: {
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Types.ObjectId || null,
         ref: COMMENT_COLLECTION
     },
     likedBy: [{
@@ -32,7 +32,7 @@ const Comment = new Schema({
         default: false
     },
     level: {
-        type: 1 || 2,
+        type: Number,
         default: 1
     }
 

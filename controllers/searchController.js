@@ -7,7 +7,7 @@ const searchItemsHandler = async (req, res) => {
     const { name, location } = req.query;
 
     try {
-        const items = await Item.find({ name: name, location: location });
+        const items = await Item.find({ "name": { "$regex": name, "$options": "i" }, location: location });
 
         return res.json({
             success: true,
