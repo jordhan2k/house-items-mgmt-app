@@ -1,5 +1,4 @@
-const { validationResult } = require("express-validator")
-const moment = require('moment');
+const { validationResult } = require("express-validator");
 const House = require("../models/House");
 const Item = require("../models/Item");
 
@@ -103,7 +102,6 @@ const updateItem = async (req, res) => {
     }
 
     try {
-
         const itemById = await Item.findById(itemId).select("-isDeleted");
 
         if (!itemById) {
@@ -144,7 +142,6 @@ const updateItem = async (req, res) => {
             message: "Item updated",
             item
         })
-
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -193,7 +190,10 @@ const deleteItem = async (req, res) => {
             houseId: deletedItem._id
         });
     } catch (error) {
-
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
     }
 }
 
