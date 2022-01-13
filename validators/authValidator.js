@@ -15,4 +15,4 @@ const authValidatorChain = [
         .withMessage("Must contains at least a digit, an uppercase, a lowercase, and a special character")
 ];
 
-module.exports = { authValidatorChain }
+module.exports = { authValidatorChain };

@@ -1,4 +1,4 @@
-const { getHouseById, createHouse, updateHouse, deleteHouse } = require('../controllers/houseController');
+const { getHouseById, createHouse, updateHouse, deleteHouse, getHouseItems, getHouseComments } = require('../controllers/houseController');
 const { verifyToken } = require('../middlewares/authMiddleware');
 const { upload } = require('../middlewares/fileUpload');
 const router = require('express').Router();
@@ -10,6 +10,21 @@ const router = require('express').Router();
  */
 router.get("/:id", getHouseById);
 
+
+/**
+ * @route GET api/v1/houses/:id/comments
+ * @desc Get all comments on a house
+ * @access PUBLIC
+ */
+router.get("/:id/comments", getHouseComments);
+
+/**
+ * @route GET api/v1/houses/:id/items
+ * @desc Get all items of a house
+ * @access PUBLIC
+ */
+router.get("/:id/items", getHouseItems);
+
 /**
  * @route POST api/v1/houses/
  * @desc Create a new house
@@ -17,7 +32,7 @@ router.get("/:id", getHouseById);
  */
 router.post("/",
     verifyToken,
-    upload.single("image"),
+    upload.single("file"),
     createHouse);
 
 /**
@@ -27,7 +42,7 @@ router.post("/",
  */
 router.put("/:id",
     verifyToken,
-    upload.single("image"),
+    upload.single("file"),
     updateHouse);
 
 /**
@@ -35,6 +50,8 @@ router.put("/:id",
  * @desc Mark an existing house as deleted
  * @access PRIVATE
  */
-router.put("/:id/delete", verifyToken, deleteHouse);
+router.put("/:id/delete",
+    verifyToken,
+    deleteHouse);
 
 module.exports = router;

@@ -1,5 +1,3 @@
-const { model } = require("mongoose");
-
 const USER_COLLECTION = "users";
 const HOUSE_COLLECTION = "houses";
 const ITEM_COLLECTION = "items";

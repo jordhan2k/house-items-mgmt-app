@@ -1,7 +1,7 @@
 
 const { checkAuthStatus, login, register } = require('../controllers/authController');
 const { verifyToken } = require('../middlewares/authMiddleware');
-const { authValidatorChain } = require('../validators/authValidators');
+const { authValidatorChain } = require('../validators/authValidator');
 const router = require('express').Router();
 
 /**

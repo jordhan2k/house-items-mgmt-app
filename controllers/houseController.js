@@ -5,7 +5,7 @@ const getHouseById = async (req, res) => {
     const houseId = req.params.id;
     console.log(houseId);
     try {
-        const byId = await House.findById(houseId);
+        const byId = await House.findById(houseId).populate("items");
 
         if (!byId || byId.isDeleted) {
             return res.status(404).json({
@@ -50,7 +50,8 @@ const createHouse = async (req, res) => {
             message: "A new house added!",
             house: {
                 ...newHouse._doc,
-                image: `${req.protocol}://${req.get('host')}${newHouse.image}`
+                image: newHouse.image,
+                imagePrefix: `${req.protocol}://${req.get('host')}`
             }
         });
 
@@ -65,7 +66,7 @@ const createHouse = async (req, res) => {
 const updateHouse = async (req, res) => {
     const houseId = req.params.id;
     const { name, address } = req.body;
-    const image = req.file;
+    const imageFile = req.file;
 
     const updateCondition = {
         _id: houseId,
@@ -75,20 +76,29 @@ const updateHouse = async (req, res) => {
     try {
         const byId = await House.findById(houseId);
 
+        if (!byId) {
+            return res.json({
+                success: false,
+                message: `Found no house with id ${houseId}`
+            });
+        }
+
         let updatedHouse = {
             ...byId._doc,
             name,
             address,
-            image: image.destination.substring(1) + image.filename
+            image: imageFile ? (imageFile.destination.substring(1) + imageFile.filename) : req.body.image
         }
 
         updatedHouse = await House.findOneAndUpdate(updateCondition, updatedHouse, { new: true });
 
         return res.json({
             success: false,
+            message: "House updated",
             house: {
                 ...updatedHouse._doc,
-                image: `${req.protocol}://${req.get('host')}${updatedHouse.image}`
+                image: updatedHouse.image,
+                imagePrefix: `${req.protocol}://${req.get('host')}`
             }
         })
 
@@ -112,7 +122,7 @@ const deleteHouse = async (req, res) => {
     try {
         const byId = await House.findById(houseId);
 
-        let  deletedHouse = {
+        let deletedHouse = {
             ...byId._doc,
             isDeleted: true
         }
@@ -122,7 +132,7 @@ const deleteHouse = async (req, res) => {
         return res.json({
             success: true,
             message: "You have dropped a house.",
-            houseId:  deletedHouse._id
+            houseId: deletedHouse._id
         });
 
     } catch (error) {
@@ -134,4 +144,51 @@ const deleteHouse = async (req, res) => {
     }
 }
 
-module.exports = { getHouseById, createHouse, updateHouse, deleteHouse };
+const getHouseItems = async (req, res) => {
+
+    try {
+
+    } catch (error) {
+
+    }
+}
+
+const getHouseComments = async (req, res) => {
+    const houseId = req.params.id;
+
+    try {
+        const houseById = await House.findById(houseId);
+        if (!houseById || houseById.isDeleted) {
+            return res.json({
+                success: false,
+                message: `Found no house with id ${houseId}`
+            })
+        }
+        const criteria = ({
+            about: houseById,
+            level: 1
+        });
+
+        const commentsByHouseId = await Comment.find(criteria).populate("replies");
+
+        return res.json({
+            success: true,
+            house: houseId,
+            comments: commentsByHouseId.filter(cmt => !cmt.isDeleted)
+        })
+    } catch (error) {
+        return res.json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+module.exports = {
+    getHouseById,
+    createHouse,
+    updateHouse,
+    deleteHouse,
+    getHouseItems,
+    getHouseComments
+};

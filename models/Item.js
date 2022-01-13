@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { ITEM_COLLECTION, HOUSE_COLLECTION } = require('./modelUtils');
+const { ITEM_COLLECTION, HOUSE_COLLECTION, USER_COLLECTION } = require('./modelUtils');
 const Schema = mongoose.Schema;
 
 const Item = new Schema({
@@ -12,16 +12,19 @@ const Item = new Schema({
         require: true,
     },
     expireDate: {
-        type: String,
+        type: Date,
+        required: true
+    },
+    purchaseDate: {
+        type: Date,
         required: true
     },
     location: {
         type: String,
         required: true
     },
-    purchaseDate: {
+    itemCode: {
         type: String,
-        required: true
     },
     function: {
         type: String,
@@ -29,11 +32,6 @@ const Item = new Schema({
     },
     price: {
         type: Number,
-        default: 0
-    },
-    isDeleted: {
-        type: Boolean,
-        default: false
     },
     warranty: {
         type: Number,
@@ -42,10 +40,14 @@ const Item = new Schema({
         type: mongoose.Types.ObjectId,
         ref: HOUSE_COLLECTION
     },
+    user: {
+        type: mongoose.Types.ObjectId,
+        ref: USER_COLLECTION
+    },
     isDeleted: {
         type: Boolean,
         default: false
-    }
+    },
 }, {
     timestamps: true
 });

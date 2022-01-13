@@ -23,9 +23,17 @@ const Comment = new Schema({
         type: mongoose.Types.ObjectId,
         ref: USER_COLLECTION
     }],
+    replies: [{
+        type: mongoose.Types.ObjectId,
+        ref: COMMENT_COLLECTION
+    }],
     isDeleted: {
         type: Boolean,
         default: false
+    },
+    level: {
+        type: 1 || 2,
+        default: 1
     }
 
 }, { timestamps: true });

@@ -8,6 +8,7 @@ const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
 const itemRouter = require('./routes/itemRoutes');
 const houseRouter = require('./routes/houseRoutes');
+const searchRouter = require('./routes/searchRoutes');
 const commentRouter = require('./routes/commentRoutes');
 const notificationRouter = require('./routes/notificationRoutes');
 
@@ -31,9 +32,10 @@ const connectDB = async () => {
 }
 connectDB();
 
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/items", itemRouter);
+app.use("/api/v1/search", searchRouter);
 app.use("/api/v1/houses", houseRouter);
 app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/notifications", notificationRouter);
