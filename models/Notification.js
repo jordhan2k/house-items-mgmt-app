@@ -7,18 +7,22 @@ const Notification = new Schema({
         type: String,
         required: true
     },
+    trigger: {
+        type: mongoose.Types.ObjectId,
+        ref: USER_COLLECTION
+    },
     isRead: {
         type: Boolean,
         default: false
+    },
+    receiver: {
+        type: mongoose.Types.ObjectId,
+        ref: USER_COLLECTION
     },
     isDeleted: {
         type: Boolean,
         default: false
     },
-    user: {
-        type: mongoose.Types.ObjectId,
-        ref: USER_COLLECTION
-    }
 }, {
     timestamps: true
 });

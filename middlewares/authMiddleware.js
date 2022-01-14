@@ -14,9 +14,13 @@ const verifyToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
         const userId = decoded.userId;
-        const userById = await User.findById(userId);
+        const username = decoded.username;
+        const foundUser = await User.findOne({
+            _id: userId,
+            username: username
+        });
 
-        if (!userById) {
+        if (!foundUser) {
             return res.status(403).json({
                 success: false,
                 message: "User does not exist"
@@ -24,6 +28,7 @@ const verifyToken = async (req, res, next) => {
         }
 
         req.userId = decoded.userId;
+        req.username = decoded.username;
         next();
     } catch (error) {
         return res.status(403).json({

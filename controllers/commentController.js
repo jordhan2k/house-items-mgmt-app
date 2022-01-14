@@ -1,5 +1,6 @@
 const Comment = require("../models/Comment");
 const House = require("../models/House");
+const Notification = require("../models/Notification");
 
 const addCommentHandler = async (req, res) => {
     const { content, about, repliedTo, level } = req.body;
@@ -36,6 +37,14 @@ const addCommentHandler = async (req, res) => {
 
             repliedComment.replies.push(newComment._id);
             repliedComment.save();
+
+            const notification = new Notification({
+                content: `${req.username} replied to your comment on house "${likedComment.about.name}"`,
+                trigger: req.userId,
+                receiver: repliedComment.postedBy
+            });
+
+            await notification.save();
         }
 
         const comment = {
@@ -61,8 +70,8 @@ const likeCommentHandler = async (req, res) => {
     const commentId = req.params.id;
 
     try {
-        const likedComment = await Comment.findById(commentId).select("-isDeleted");
-
+        const likedComment = await Comment.findById(commentId).select("-isDeleted").populate("about", "name");
+        console.log(likedComment._doc);
         if (!likedComment) {
             return res.status(404).json({
                 success: false,
@@ -73,6 +82,14 @@ const likeCommentHandler = async (req, res) => {
         if (!likedComment.likedBy.includes(req.userId)) {
             likedComment.likedBy.push(req.userId);
             await likedComment.save();
+
+            const notification = new Notification({
+                content: `${req.username} liked your comment on house "${likedComment.about.name}"`,
+                trigger: req.userId,
+                receiver: likedComment.postedBy
+            });
+
+            await notification.save();
         }
 
         return res.json({
@@ -145,7 +162,7 @@ const editCommentHandler = async (req, res) => {
             ...req.body
         }
 
-        editedComment = await Comment.findByIdAndUpdate(editCondition, editedComment, {new: true});
+        editedComment = await Comment.findByIdAndUpdate(editCondition, editedComment, { new: true });
 
         return res.json({
             success: true,

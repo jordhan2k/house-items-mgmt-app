@@ -63,9 +63,12 @@ const login = async (req, res) => {
         }
 
         const accessToken = jwt.sign(
-            { userId: byUsername._id },
+            {
+                userId: byUsername._id,
+                username: byUsername.username
+            },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: 3600 });
+            { expiresIn: 3600 * 2 });
 
         const newHistory = new LoginHistory(
             {
@@ -114,9 +117,12 @@ const register = async (req, res) => {
         await newUser.save();
 
         const accessToken = jwt.sign(
-            { userId: newUser._id },
+            {
+                userId: newUser._id,
+                username: newUser.username
+            },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: 3600 });
+            { expiresIn: 3600 * 2 });
 
         const newHistory = new LoginHistory(
             {

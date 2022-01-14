@@ -34,7 +34,8 @@ const Comment = new Schema({
     level: {
         type: Number,
         default: 1
-    }
+    },
+    
 
 }, { timestamps: true });
 
