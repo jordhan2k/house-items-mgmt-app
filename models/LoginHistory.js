@@ -13,6 +13,10 @@ const LoginHistory = new Schema({
     loginAt: {
         type: Date,
         default: Date.now()
+    },
+    loginNo: {
+        type: Number,
+        default: 1
     }
 });
 

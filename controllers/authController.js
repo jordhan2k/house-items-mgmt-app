@@ -73,17 +73,21 @@ const login = async (req, res) => {
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: 3600 * 2 });
 
+        const histories = await LoginHistory.find({ user: byUsername._id });
+
         const newHistory = new LoginHistory(
             {
                 user: byUsername._id,
                 device: req.device.type,
+                loginNo: histories.length + 1
             });
 
         await newHistory.save();
 
         return res.json({
             success: true,
-            accessToken
+            accessToken,
+            loginSession: newHistory._id
         })
 
     } catch (error) {
@@ -146,7 +150,8 @@ const register = async (req, res) => {
 
         return res.json({
             success: true,
-            accessToken
+            accessToken,
+            loginSession: newHistory._id
         })
 
     } catch (error) {

@@ -78,19 +78,19 @@ const modifyNotificationHandler = async (req, res) => {
 const getLastLoginHandler = async (req, res) => {
 
     try {
-        const lastLogin = await LoginHistory.find({ user: req.userId }).sort({ "loginAt": -1 });
+        const lastLogin = await LoginHistory.find({ user: req.userId }).sort({ "loginNo": -1 });
 
         return res.json({
             success: true,
             userId: req.userId,
-            history: lastLogin
-        })
+            lastLogin: lastLogin[1]
+        });
 
     } catch (error) {
         return res.json({
             success: false,
             message: "Internal server error"
-        })
+        });
     }
 }
 
