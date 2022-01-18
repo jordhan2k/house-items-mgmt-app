@@ -3,12 +3,14 @@ const { validationResult } = require("express-validator");
 const User = require("../models/User");
 const jwt = require('jsonwebtoken');
 const LoginHistory = require("../models/LoginHistory");
+const House = require("../models/House");
 
 const checkAuthStatus = async (req, res) => {
     const userId = req.userId;
+    const username = req.username;
 
     try {
-        const byId = await User.find({ _id: userId }).select("-password").populate("houses");
+        const byId = await User.findOne({ _id: userId, username: username }).select("-password");
 
         if (!byId) {
             return res.json({
@@ -36,9 +38,10 @@ const login = async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({
+        return res.json({
             success: false,
-            errors: errors.array()
+            errors: errors.array(),
+            message: "Invalid credentials."
         });
     }
 
@@ -48,7 +51,7 @@ const login = async (req, res) => {
         const byUsername = await User.findOne({ username: username });
 
         if (!byUsername) {
-            return res.status(400).json({
+            return res.json({
                 success: false,
                 message: "Invalid credentials"
             });
@@ -56,7 +59,7 @@ const login = async (req, res) => {
 
         const passwordMatch = await bcryptjs.compare(password, byUsername.password);
         if (!passwordMatch) {
-            return res.status(400).json({
+            return res.json({
                 success: false,
                 message: "Invalid credentials"
             });
@@ -105,7 +108,7 @@ const register = async (req, res) => {
     try {
         const byUsername = await User.findOne({ username: username });
         if (byUsername) {
-            return res.status(400).json({
+            return res.json({
                 success: false,
                 message: "Username is already taken"
             });
@@ -132,6 +135,15 @@ const register = async (req, res) => {
 
         await newHistory.save();
 
+        const newHouse = new House({
+            name: "My first house",
+            user: newUser._id
+        });
+        await newHouse.save();
+        newUser.houses.push(newHouse._id);
+
+        await newUser.save();
+
         return res.json({
             success: true,
             accessToken
@@ -146,4 +158,50 @@ const register = async (req, res) => {
     }
 }
 
-module.exports = { checkAuthStatus, login, register };
+const checkUsername = async (req, res) => {
+
+    const { username } = req.query;
+
+    try {
+
+        if (username.length < 6) {
+            return res.json({
+                success: false,
+                result: {
+                    query: username,
+                    message: "Invalid length"
+                }
+            });
+        }
+
+        const byUsername = await User.findOne({ username: username });
+
+        if (byUsername) {
+            return res.json({
+                success: true,
+                result: {
+                    query: username,
+                    isTaken: true,
+                }
+            });
+        }
+
+        return res.json({
+            success: true,
+            result: {
+                query: username,
+                isTaken: false
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+
+}
+
+module.exports = { checkAuthStatus, login, register, checkUsername };

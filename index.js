@@ -24,7 +24,7 @@ const connectDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        console.log("Connected to DB");
+        console.log("Connected to remote DB");
     } catch (error) {
         console.log(error);
         process.exit(1);
@@ -44,5 +44,5 @@ const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
     console.log(`Starting server at port: ${port}`);
-})
+});
 

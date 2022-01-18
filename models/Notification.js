@@ -23,8 +23,10 @@ const Notification = new Schema({
         type: Boolean,
         default: false
     },
-}, {
-    timestamps: true
+    loginAt: {
+        type: Date,
+        default: new Date()
+    }
 });
 
 

@@ -1,5 +1,5 @@
 
-const { checkAuthStatus, login, register } = require('../controllers/authController');
+const { checkAuthStatus, login, register, checkUsername } = require('../controllers/authController');
 const { verifyToken } = require('../middlewares/authMiddleware');
 const { authValidatorChain } = require('../validators/authValidator');
 const router = require('express').Router();
@@ -9,7 +9,7 @@ const router = require('express').Router();
  * @desc Verify access token and return user info
  * @access PUBLIC
  */
-router.get("/", verifyToken ,checkAuthStatus);
+router.get("/", verifyToken, checkAuthStatus);
 
 /**
  * @route POST api/v1/auth/login
@@ -24,5 +24,7 @@ router.post("/login", authValidatorChain, login);
  * @access PUBLIC 
  */
 router.post("/register", authValidatorChain, register);
+
+router.get("/check-username", checkUsername);
 
 module.exports = router;
