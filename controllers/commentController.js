@@ -21,10 +21,20 @@ const addCommentHandler = async (req, res) => {
             about,
             repliedTo,
             level,
-            postedBy: userId
+            postedBy: { _id: userId, username: req.username }
         });
 
         await newComment.save();
+
+        if (level === 1) {
+            const notification = new Notification({
+                content: `${req.username} commented on your house`,
+                trigger: req.userId,
+                receiver: houseById.user
+            });
+
+            await notification.save();
+        }
 
         if (level === 2) {
             const repliedComment = await Comment.findById(repliedTo);
@@ -34,24 +44,16 @@ const addCommentHandler = async (req, res) => {
                     message: `You are replying to an unexisting comment with id ${repliedTo}`
                 });
             }
-
             repliedComment.replies.push(newComment._id);
             repliedComment.save();
-
             const notification = new Notification({
-                content: `${req.username} replied to your comment on house "${likedComment.about.name}"`,
+                content: `${req.username} replied to your comment on house "${repliedComment.about.name}"`,
                 trigger: req.userId,
                 receiver: repliedComment.postedBy
             });
-
             await notification.save();
         }
-
-        const comment = {
-            ...newComment._doc
-        };
-
-        delete comment.isDeleted;
+        const comment = await Comment.findById(newComment._id).select("-isDeleted").populate("postedBy", "username");
 
         return res.json({
             success: true,
@@ -70,7 +72,7 @@ const likeCommentHandler = async (req, res) => {
     const commentId = req.params.id;
 
     try {
-        const likedComment = await Comment.findById(commentId).select("-isDeleted").populate("about", "name");
+        let likedComment = await Comment.findById(commentId).select("-isDeleted");
         console.log(likedComment._doc);
         if (!likedComment) {
             return res.status(404).json({
@@ -92,6 +94,8 @@ const likeCommentHandler = async (req, res) => {
             await notification.save();
         }
 
+        likedComment = await Comment.findById(commentId).populate("replies");
+
         return res.json({
             success: true,
             comment: {
@@ -111,7 +115,7 @@ const unlikeCommentHandler = async (req, res) => {
     const commentId = req.params.id;
 
     try {
-        const unlikedComment = await Comment.findById(commentId).select("-isDeleted");
+        let unlikedComment = await Comment.findById(commentId).select("-isDeleted");
 
         if (!unlikedComment) {
             return res.status(404).json({
@@ -122,6 +126,8 @@ const unlikeCommentHandler = async (req, res) => {
 
         unlikedComment.likedBy.pull(req.userId);
         await unlikedComment.save();
+
+        unlikedComment = await Comment.findById(commentId).populate("replies");
 
         return res.json({
             success: true,
@@ -144,7 +150,7 @@ const editCommentHandler = async (req, res) => {
     try {
         const commentById = await Comment.findById(commentId).select("-isDeleted");
 
-        if (commentById.postedBy.toString() !== req.userId) {
+        if (commentById.postedBy._id.toString() !== req.userId) {
             return res.status(403).json({
                 success: false,
                 message: "You have no permission on this comment"
@@ -163,6 +169,7 @@ const editCommentHandler = async (req, res) => {
         }
 
         editedComment = await Comment.findByIdAndUpdate(editCondition, editedComment, { new: true });
+        editedComment = await Comment.findById(commentId).populate("replies");
 
         return res.json({
             success: true,
@@ -187,9 +194,11 @@ const deleteCommentHandler = async (req, res) => {
     try {
         const commentById = await Comment.findById(commentId);
 
-        if (commentById.postedBy.toString() !== req.userId) {
-            return res.status(403).json({
+        if (commentById.postedBy._id.toString() !== req.userId) {
+            return res.json({
                 success: false,
+                yourId: req.userId,
+                commentBy: commentById.postedBy._id.toString(),
                 message: "You have no permission on this comment"
             });
         }
@@ -210,7 +219,8 @@ const deleteCommentHandler = async (req, res) => {
         return res.json({
             success: true,
             message: "Comment deleted",
-            commentId: deletedComment._id
+            commentId: deletedComment._id,
+            level: commentById.level
         })
 
     } catch (error) {

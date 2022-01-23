@@ -32,6 +32,7 @@ const getItemById = async (req, res) => {
 const createItem = async (req, res) => {
     const errors = validationResult(req);
     const houseId = req.body.house;
+    console.log(req.file);
 
     if (!errors.isEmpty()) {
         res.json({
@@ -143,6 +144,7 @@ const updateItem = async (req, res) => {
             item
         })
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: "Internal server error"
@@ -187,7 +189,7 @@ const deleteItem = async (req, res) => {
         return res.json({
             success: true,
             message: "You have dropped an item.",
-            houseId: deletedItem._id
+            itemId: deletedItem._id
         });
     } catch (error) {
         return res.status(500).json({

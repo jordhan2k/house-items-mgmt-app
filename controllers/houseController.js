@@ -1,3 +1,4 @@
+const Comment = require("../models/Comment");
 const House = require("../models/House");
 const User = require("../models/User");
 
@@ -5,7 +6,7 @@ const getHouseById = async (req, res) => {
     const houseId = req.params.id;
     console.log(houseId);
     try {
-        const byId = await House.findById(houseId).populate("items");
+        const byId = await House.findById(houseId).select("-isDeleted").populate("items");
 
         if (!byId || byId.isDeleted) {
             return res.status(404).json({
@@ -17,6 +18,7 @@ const getHouseById = async (req, res) => {
         return res.json({
             success: true,
             house: byId,
+            imagePrefix: `${req.protocol}://${req.get('host')}`
         })
 
     } catch (error) {
@@ -145,7 +147,6 @@ const deleteHouse = async (req, res) => {
 }
 
 const getHouseItems = async (req, res) => {
-
     try {
 
     } catch (error) {
@@ -169,7 +170,7 @@ const getHouseComments = async (req, res) => {
             level: 1
         });
 
-        const commentsByHouseId = await Comment.find(criteria).populate("replies");
+        const commentsByHouseId = await Comment.find(criteria).sort({ "createdAt": -1 }).populate("replies");
 
         return res.json({
             success: true,
@@ -177,6 +178,7 @@ const getHouseComments = async (req, res) => {
             comments: commentsByHouseId.filter(cmt => !cmt.isDeleted)
         })
     } catch (error) {
+        console.log(error);
         return res.json({
             success: false,
             message: "Internal server error"

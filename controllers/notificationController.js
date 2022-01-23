@@ -5,9 +5,8 @@ const READ = "read";
 const DELETED = "delete";
 
 const getNotificationsHandler = async (req, res) => {
-
     try {
-        const notifications = await Notification.find({});
+        const notifications = await Notification.find({ receiver: req.userId }).sort({ "createdAt": -1 });
         return res.json({
             success: true,
             notifications

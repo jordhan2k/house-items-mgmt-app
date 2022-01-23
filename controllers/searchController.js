@@ -50,7 +50,11 @@ const searchUsersHandler = async (req, res) => {
 
         return res.json({
             success: true,
-            users
+            result: {
+                keyword: username,
+                users,
+                found: users.length
+            }
         });
 
     } catch (error) {

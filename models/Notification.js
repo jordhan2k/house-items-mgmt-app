@@ -23,11 +23,7 @@ const Notification = new Schema({
         type: Boolean,
         default: false
     },
-    loginAt: {
-        type: Date,
-        default: new Date()
-    }
-});
+}, { timestamps: true });
 
 
 module.exports = mongoose.model(NOTIFICATION_COLLECTION, Notification);

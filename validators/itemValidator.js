@@ -6,7 +6,7 @@ const itemValidatorChain = [
     check("name")
         .notEmpty()
         .withMessage("Must not be empty"),
-    check("function")
+    check("itemFunction")
         .notEmpty()
         .withMessage("Must not be empty"),
     check("location")

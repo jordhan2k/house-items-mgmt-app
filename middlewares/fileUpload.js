@@ -20,7 +20,7 @@ const upload = multer({
         fieldSize: MAX_FILE_SIZE
     },
     fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|jfif)$/)) {
             return cb(new Error("Only images are allowed"), false);
         }
         cb(null, true);

@@ -7,9 +7,19 @@ const Comment = new Schema({
         type: String,
         required: true
     },
-    postedBy: {
+    canDelete: {
         type: mongoose.Types.ObjectId,
         ref: USER_COLLECTION
+    },
+    postedBy: {
+        _id: {
+            type: mongoose.Types.ObjectId,
+            ref: USER_COLLECTION
+        },
+        username: {
+            type: String,
+            required: true
+        }
     },
     about: {
         type: mongoose.Types.ObjectId,
@@ -31,12 +41,14 @@ const Comment = new Schema({
         type: Boolean,
         default: false
     },
+    isEdited: {
+        type: Boolean,
+        default: false
+    },
     level: {
         type: Number,
         default: 1
     },
-    
-
 }, { timestamps: true });
 
 module.exports = mongoose.model(COMMENT_COLLECTION, Comment);

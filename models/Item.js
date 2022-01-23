@@ -17,7 +17,6 @@ const Item = new Schema({
     },
     purchaseDate: {
         type: Date,
-        required: true
     },
     location: {
         type: String,
@@ -26,14 +25,11 @@ const Item = new Schema({
     itemCode: {
         type: String,
     },
-    function: {
+    itemFunction: {
         type: String,
         required: true
     },
     price: {
-        type: Number,
-    },
-    warranty: {
         type: Number,
     },
     house: {
