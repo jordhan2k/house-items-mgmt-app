@@ -11,7 +11,6 @@ const checkAuthStatus = async (req, res) => {
 
     try {
         const byId = await User.findOne({ _id: userId, username: username }).select("-password");
-
         if (!byId) {
             return res.json({
                 success: false,
@@ -45,7 +44,7 @@ const login = async (req, res) => {
         });
     }
 
-    const { username, password } = req.body;
+    const { username, password, staySignedIn } = req.body;
 
     try {
         const byUsername = await User.findOne({ username: username });
@@ -71,7 +70,7 @@ const login = async (req, res) => {
                 username: byUsername.username
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: 3600 * 2 });
+            !staySignedIn && { expiresIn: 3600 * 2 });
 
         const histories = await LoginHistory.find({ user: byUsername._id });
 
@@ -91,6 +90,7 @@ const login = async (req, res) => {
         })
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: "Internal server error"
@@ -102,7 +102,7 @@ const register = async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({
+        return res.json({
             success: false,
             errors: errors.array()
         });
@@ -168,7 +168,6 @@ const checkUsername = async (req, res) => {
     const { username } = req.query;
 
     try {
-
         if (username.length < 6) {
             return res.json({
                 success: false,
@@ -206,7 +205,6 @@ const checkUsername = async (req, res) => {
             message: "Internal server error"
         })
     }
-
 }
 
 module.exports = { checkAuthStatus, login, register, checkUsername };
